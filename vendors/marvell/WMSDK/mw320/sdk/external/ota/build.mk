@@ -4,7 +4,7 @@
 libs-y += libawsota
 
 global-cflags-y += -I$(d)/../../../../../../../../third_party/jsmn \
-		   -I$(d)/../../../../../../../../third_party/tinycbor/src
+		   -I$(d)/../../../../../../../../third_party/tinycbor
 
 libawsota-objs-y := \
 		../../../../../../../../ota/portable/marvell/mw300_rd/aws_ota_pal.c \

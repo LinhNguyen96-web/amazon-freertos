@@ -637,14 +637,9 @@
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/freertos_plus/aws/greengrass/include/aws_greengrass_discovery.h</locationURI>
 		</link>
 		<link>
-			<name>libraries/c_sdk/aws/defender/test/unit/aws_iot_tests_defender_unit.c</name>
+			<name>libraries/c_sdk/aws/defender/test/aws_iot_tests_defender_api.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/aws/defender/test/unit/aws_iot_tests_defender_unit.c</locationURI>
-		</link>
-		<link>
-			<name>libraries/c_sdk/aws/defender/test/system/aws_iot_tests_defender_system.c</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/aws/defender/test/system/aws_iot_tests_defender_system.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/aws/defender/test/aws_iot_tests_defender_api.c</locationURI>
 		</link>
 		<link>
 			<name>libraries/c_sdk/aws/shadow/test/aws_test_shadow.c</name>
@@ -680,11 +675,6 @@
 			<name>libraries/c_sdk/standard/mqtt/test/iot_test_mqtt_agent.c</name>
 			<type>1</type>
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/standard/mqtt/test/iot_test_mqtt_agent.c</locationURI>
-		</link>
-		<link>
-			<name>libraries/c_sdk/standard/mqtt/test/mock/iot_tests_mqtt_mock.c</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/standard/mqtt/test/mock/iot_tests_mqtt_mock.c</locationURI>
 		</link>
 		<link>
 			<name>libraries/c_sdk/standard/mqtt/test/system/iot_tests_mqtt_system.c</name>
@@ -727,14 +717,9 @@
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/c_sdk/standard/serializer/test/iot_tests_serializer_json.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/freertos_plus/aws/greengrass/test/aws_test_ggd_system.c</name>
+			<name>libraries/freertos_plus/aws/greengrass/test/aws_test_greengrass_discovery.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/freertos_plus/aws/greengrass/test/aws_test_ggd_system.c</locationURI>
-		</link>
-		<link>
-			<name>libraries/freertos_plus/aws/greengrass/test/aws_test_ggd_unit.c</name>
-			<type>1</type>
-			<locationURI>AFR_HOME/libraries/freertos_plus/aws/greengrass/test/aws_test_ggd_unit.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/freertos_plus/aws/greengrass/test/aws_test_greengrass_discovery.c</locationURI>
 		</link>
 		<link>
 			<name>libraries/freertos_plus/aws/greengrass/test/aws_test_helper_secure_connect.c</name>
@@ -1006,11 +991,6 @@
 			<name>libraries/3rdparty/mbedtls/library/error.c</name>
 			<type>1</type>
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/mbedtls/library/error.c</locationURI>
-		</link>
-		<link>
-			<name>libraries/3rdparty/mbedtls_utils/mbedtls_error.c</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/mbedtls/library/mbedts_error.c</locationURI>
 		</link>
 		<link>
 			<name>libraries/3rdparty/mbedtls/library/gcm.c</name>
@@ -1393,11 +1373,6 @@
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/mbedtls/include/mbedtls/error.h</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/mbedtls_utils/mbedtls_error.h</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/mbedtls_utils/mbedtls_error.h</locationURI>
-		</link>
-		<link>
 			<name>libraries/3rdparty/mbedtls/include/mbedtls/gcm.h</name>
 			<type>1</type>
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/mbedtls/include/mbedtls/gcm.h</locationURI>
@@ -1653,39 +1628,34 @@
 			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/unity/extras/fixture/src/unity_fixture_malloc_overrides.h</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborpretty.c</name>
+			<name>libraries/3rdparty/tinycbor/cborpretty.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborpretty.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborpretty.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborpretty_stdio.c</name>
+			<name>libraries/3rdparty/tinycbor/cborencoder.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborpretty_stdio.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborencoder.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborencoder.c</name>
+			<name>libraries/3rdparty/tinycbor/cborencoder_close_container_checked.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborencoder.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborencoder_close_container_checked.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborencoder_close_container_checked.c</name>
+			<name>libraries/3rdparty/tinycbor/cborerrorstrings.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborencoder_close_container_checked.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborerrorstrings.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborerrorstrings.c</name>
+			<name>libraries/3rdparty/tinycbor/cborparser.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborerrorstrings.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborparser.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborparser.c</name>
+			<name>libraries/3rdparty/tinycbor/cborparser_dup_string.c</name>
 			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborparser.c</locationURI>
-		</link>
-		<link>
-			<name>libraries/3rdparty/tinycbor/src/cborparser_dup_string.c</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/src/cborparser_dup_string.c</locationURI>
+			<locationURI>AWS_IOT_MCU_ROOT/libraries/3rdparty/tinycbor/cborparser_dup_string.c</locationURI>
 		</link>
 		<link>
 			<name>libraries/3rdparty/jsmn/jsmn.h</name>

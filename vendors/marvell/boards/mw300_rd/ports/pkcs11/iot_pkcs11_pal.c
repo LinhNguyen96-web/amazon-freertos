@@ -98,11 +98,6 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
     }
 }
 
-CK_RV PKCS11_PAL_Initialize( void )
-{
-    return CKR_OK;
-}
-
 /**
  * @brief Writes a file to local storage.
  *
@@ -115,8 +110,8 @@ CK_RV PKCS11_PAL_Initialize( void )
  * @return The file handle of the object that was stored.
  */
 CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
-                                        CK_BYTE_PTR pucData,
-                                        CK_ULONG ulDataSize )
+                                        uint8_t * pucData,
+                                        uint32_t ulDataSize )
 {
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char * pcFileName = NULL;
@@ -162,15 +157,15 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
  * @return The object handle if operation was successful.
  * Returns eInvalidHandle if unsuccessful.
  */
-CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
-                                        CK_ULONG usLength )
+CK_OBJECT_HANDLE PKCS11_PAL_FindObject( uint8_t * pcLabel,
+                                        uint8_t usLength )
 {
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char * pcFileName = NULL;
     int ret;
 
     /* Translate from the PKCS#11 label to local storage file name. */
-    prvLabelToFilenameHandle(pxLabel, &pcFileName, &xHandle);
+    prvLabelToFilenameHandle(pcLabel, &pcFileName, &xHandle);
 
     if (pcFileName == NULL) {
         /* TODO: Check what print function to use */
@@ -221,9 +216,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 * error, CKR_ARGUMENTS_BAD for bad arguments.
 */
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-                                      CK_BYTE_PTR * ppucData,
-                                      CK_ULONG_PTR pulDataSize,
-                                      CK_BBOOL * pIsPrivate )
+    uint8_t ** ppucData,
+    uint32_t * pulDataSize,
+    CK_BBOOL * pIsPrivate )
 {
     char * pcFileName = NULL;
     int ret;
@@ -315,8 +310,8 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 * @param[in] ulDataSize    The length of the buffer to free.
 *                          (*pulDataSize from PKCS11_PAL_GetObjectValue())
 */
-void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
-                                       CK_ULONG ulDataSize )
+void PKCS11_PAL_GetObjectValueCleanup( uint8_t * pucData,
+    uint32_t ulDataSize )
 {
     if (pucData == NULL)
         return;

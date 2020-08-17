@@ -26,7 +26,7 @@
 /* Test framework includes. */
 #include "unity_fixture.h"
 
-#include "iot_test_common_io_internal.h"
+#include "test_iot_internal.h"
 
 /* Define Test Group. */
 TEST_GROUP( Common_IO );
@@ -56,24 +56,24 @@ TEST_GROUP_RUNNER( Common_IO )
 {
     size_t i = 0;
 
-    #ifdef IOT_TEST_COMMON_IO_UART_SUPPORTED
-        for( i = 0; i < IOT_TEST_COMMON_IO_UART_SUPPORTED; i++ )
+    #if ( IOT_TEST_COMMON_IO_UART_SUPPORTED == 1 )
+        for( i = 0; i < UART_TEST_SET; i++ )
         {
             SET_TEST_IOT_UART_CONFIG( i );
             RUN_TEST_GROUP( TEST_IOT_UART );
         }
     #endif
 
-    #ifdef IOT_TEST_COMMON_IO_I2C_SUPPORTED
-        for( i = 0; i < IOT_TEST_COMMON_IO_I2C_SUPPORTED; i++ )
+    #if ( IOT_TEST_COMMON_IO_I2C_SUPPORTED == 1 )
+        for( i = 0; i < I2C_TEST_SET; i++ )
         {
             SET_TEST_IOT_I2C_CONFIG( i );
             RUN_TEST_GROUP( TEST_IOT_I2C );
         }
     #endif
 
-    #ifdef IOT_TEST_COMMON_IO_SPI_SUPPORTED
-        for( i = 0; i < IOT_TEST_COMMON_IO_SPI_SUPPORTED; i++ )
+    #if ( IOT_TEST_COMMON_IO_SPI_SUPPORTED == 1 )
+        for( i = 0; i < SPI_TEST_SET; i++ )
         {
             SET_TEST_IOT_SPI_CONFIG( i );
             RUN_TEST_GROUP( TEST_IOT_SPI );

@@ -30,16 +30,10 @@
 extern "C" {
 #endif
 
-/* INTERNAL API FUNCTIONS. */
+/* NOTE PUBLIC API FUNCTIONS. */
 BaseType_t xNetworkInterfaceInitialise( void );
 BaseType_t xNetworkInterfaceOutput( NetworkBufferDescriptor_t * const pxNetworkBuffer, BaseType_t xReleaseAfterSend );
-/* coverity[misra_c_2012_rule_8_6_violation] */
-/* "vNetworkInterfaceAllocateRAMToBuffers" is declared but never defined.
-The following function is only used when BufferAllocation_1.c is linked in the project. */
 void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkBuffers[ ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS ] );
-
-/* "xGetPhyLinkStatus" is provided by the network driver. */
-/* coverity[misra_c_2012_rule_8_6_violation] */
 BaseType_t xGetPhyLinkStatus( void );
 
 #ifdef __cplusplus

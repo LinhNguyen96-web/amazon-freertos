@@ -24,18 +24,12 @@
  */
 
 /**
- * @file iot_test_freertos.c
- * @brief Common hooks file for platforms that have not implemented hooks.
+ * @file iot_demo_freertos.c
+ * @brief Generic demo runner for C SDK libraries on FreeRTOS.
  */
 
-#include "iot_config.h"
 #include "FreeRTOS.h"
 #include "task.h"
-
-/* It is recommended to implement hooks that use platform specific APIs. This allows
- * for better error messages and recovery. Should platform specific hooks be implemented,
- * add this macro to iot_config.h to avoid compiling these symbols.*/
-#ifndef iotconfigUSE_PORT_SPECIFIC_HOOKS
 
 /**
  * @brief Warn user if pvPortMalloc fails.
@@ -47,16 +41,16 @@
  * configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
  *
  */
-    void vApplicationMallocFailedHook()
-    {
-        configPRINT_STRING( ( "ERROR: Malloc failed to allocate memory\r\n" ) );
-        taskDISABLE_INTERRUPTS();
+void vApplicationMallocFailedHook()
+{
+    configPRINTF( ( "ERROR: Malloc failed to allocate memory\r\n" ) );
+    taskDISABLE_INTERRUPTS();
 
-        /* Loop forever */
-        for( ; ; )
-        {
-        }
+    /* Loop forever */
+    for( ; ; )
+    {
     }
+}
 /*-----------------------------------------------------------*/
 
 /**
@@ -70,19 +64,14 @@
  * has occurred.
  *
  */
-    void vApplicationStackOverflowHook( TaskHandle_t xTask,
-                                        char * pcTaskName )
+void vApplicationStackOverflowHook( TaskHandle_t xTask,
+                                    char * pcTaskName )
+{
+    configPRINTF( ( "ERROR: stack overflow with task %s\r\n", pcTaskName ) );
+    portDISABLE_INTERRUPTS();
+
+    /* Loop forever */
+    for( ; ; )
     {
-        /* Disable unused parameter warnings. */
-        ( void ) xTask;
-        ( void ) pcTaskName;
-
-        configPRINT_STRING( ( "ERROR: stack overflow with task \r\n" ) );
-        portDISABLE_INTERRUPTS();
-
-        /* Loop forever */
-        for( ; ; )
-        {
-        }
     }
-#endif /* iotconfigUSE_PORT_SPECIFIC_HOOKS */
+}

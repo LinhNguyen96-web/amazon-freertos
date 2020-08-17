@@ -170,13 +170,7 @@ extern void vLoggingPrint( const char * pcMessage );
 
 /* Map the logging task's printf to the board specific output function. */
 #include "xil_printf.h"
-
-#define configPAUSE_AFTER_XIL_PRINTF_MSEC	20
-
-#define configPRINT_STRING( X ) \
-	xil_printf( X ); \
-	vTaskDelay( pdMS_TO_TICKS( configPAUSE_AFTER_XIL_PRINTF_MSEC ) )
-
+#define configPRINT_STRING( X )    xil_printf( X );
 /* Sets the length of the buffers into which logging messages are written - so
  * also defines the maximum length of each log message. */
 #define configLOGGING_MAX_MESSAGE_LENGTH            100

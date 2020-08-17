@@ -25,7 +25,7 @@
 
 
 /**
- * @file iot_pkcs11_pal.c
+ * @file aws_pkcs11_pal.c
  * @brief Windows Simulator file save and read implementation
  * for PKCS#11 based on mbedTLS with for software keys. This
  * file deviates from the FreeRTOS style standard for some function names and
@@ -44,45 +44,26 @@
 #include <stdio.h>
 #include <string.h>
 
-/**
- * @ingroup pkcs11_macros
- * @brief Macros for managing PKCS #11 objects in flash.
- *
- */
-#define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"       /**< The file name of the Certificate object. */
-#define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"               /**< The file name of the Key object. */
-#define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"       /**< The file name of the Code Sign Key object. */
 
-/**
- * @ingroup pkcs11_macros
- * @brief PKCS #11 logging macro.
- *
- */
+#define pkcs11palFILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"
+#define pkcs11palFILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"
+#define pkcs11palFILE_CODE_SIGN_PUBLIC_KEY       "FreeRTOS_P11_CodeSignKey.dat"
+
 #define PKCS11_PAL_PRINT( X )    vLoggingPrintf X
 
-/**
- * @ingroup pkcs11_enums
- * @brief Enums for managing PKCS #11 object types.
- *
- */
+
 enum eObjectHandles
 {
-    eInvalidHandle = 0,            /**< According to PKCS #11 spec, 0 is never a valid object handle. */
-    eAwsDevicePrivateKey = 1,      /**< Private Key. */
-    eAwsDevicePublicKey,           /**< Public Key. */
-    eAwsDeviceCertificate,         /**< Certificate. */
-    eAwsCodeSigningKey             /**< Code Signing Key. */
+    eInvalidHandle = 0, /* According to PKCS #11 spec, 0 is never a valid object handle. */
+    eAwsDevicePrivateKey = 1,
+    eAwsDevicePublicKey,
+    eAwsDeviceCertificate,
+    eAwsCodeSigningKey
 };
 
 /*-----------------------------------------------------------*/
 
-/**
- * @brief Checks to see if a file exists
- *
- * @param[in] pcFileName         The name of the file to check for existance.
- * 
- * @returns pdTRUE if the file exists, pdFALSE if not.
- */
+/* Returns pdTRUE if the file exists, pdFALSE if not. */
 BaseType_t prvFileExists( const char * pcFileName )
 {
     DWORD xReturn;
@@ -99,14 +80,7 @@ BaseType_t prvFileExists( const char * pcFileName )
     }
 }
 
-/**
- * @brief Checks to see if a file exists
- *
- * @param[in] pcLabel            The PKCS #11 label to convert to a file name
- * @param[out] pcFileName        The name of the file to check for existance.
- * @param[out] pHandle           The type of the PKCS #11 object.
- * 
- */
+/* Converts a label to its respective filename and handle. */
 void prvLabelToFilenameHandle( uint8_t * pcLabel,
                                char ** pcFileName,
                                CK_OBJECT_HANDLE_PTR pHandle )
@@ -150,16 +124,22 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
     }
 }
 
-/*-----------------------------------------------------------*/
 
-CK_RV PKCS11_PAL_Initialize( void )
-{
-    return CKR_OK;
-}
-
+/**
+ * @brief Saves an object in non-volatile storage.
+ *
+ * Port-specific file write for cryptographic information.
+ *
+ * @param[in] pxLabel       Attribute containing label of the object to be stored.
+ * @param[in] pucData       The object data to be saved
+ * @param[in] pulDataSize   Size (in bytes) of object data.
+ *
+ * @return The object handle if successful.
+ * eInvalidHandle = 0 if unsuccessful.
+ */
 CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
-                                        CK_BYTE_PTR pucData,
-                                        CK_ULONG ulDataSize )
+                                        uint8_t * pucData,
+                                        uint32_t ulDataSize )
 {
     uint32_t ulStatus = 0;
     HANDLE hFile = INVALID_HANDLE_VALUE;
@@ -212,11 +192,25 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
     return xHandle;
 }
 
+
 /*-----------------------------------------------------------*/
 
+/**
+ * @brief Translates a PKCS #11 label into an object handle.
+ *
+ * Port-specific object handle retrieval.
+ *
+ *
+ * @param[in] pLabel         Pointer to the label of the object
+ *                           who's handle should be found.
+ * @param[in] usLength       The length of the label, in bytes.
+ *
+ * @return The object handle if operation was successful.
+ * Returns eInvalidHandle if unsuccessful.
+ */
 
-CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
-                                        CK_ULONG usLength )
+CK_OBJECT_HANDLE PKCS11_PAL_FindObject( uint8_t * pLabel,
+                                        uint8_t usLength )
 {
     /* Avoid compiler warnings about unused variables. */
     ( void ) usLength;
@@ -225,7 +219,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
     char * pcFileName = NULL;
 
     /* Converts a label to its respective filename and handle. */
-    prvLabelToFilenameHandle( pxLabel,
+    prvLabelToFilenameHandle( pLabel,
                               &pcFileName,
                               &xHandle );
 
@@ -237,12 +231,36 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 
     return xHandle;
 }
+
 /*-----------------------------------------------------------*/
 
+/**
+ * @brief Gets the value of an object in storage, by handle.
+ *
+ * Port-specific file access for cryptographic information.
+ *
+ * This call dynamically allocates the buffer which object value
+ * data is copied into.  PKCS11_PAL_GetObjectValueCleanup()
+ * should be called after each use to free the dynamically allocated
+ * buffer.
+ *
+ * @sa PKCS11_PAL_GetObjectValueCleanup
+ *
+ * @param[in] pcFileName    The name of the file to be read.
+ * @param[out] ppucData     Pointer to buffer for file data.
+ * @param[out] pulDataSize  Size (in bytes) of data located in file.
+ * @param[out] pIsPrivate   Boolean indicating if value is private (CK_TRUE)
+ *                          or exportable (CK_FALSE)
+ *
+ * @return CKR_OK if operation was successful.  CKR_KEY_HANDLE_INVALID if
+ * no such object handle was found, CKR_DEVICE_MEMORY if memory for
+ * buffer could not be allocated, CKR_FUNCTION_FAILED for device driver
+ * error.
+ */
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-                                      CK_BYTE_PTR * ppucData,
-                                      CK_ULONG_PTR pulDataSize,
-                                      CK_BBOOL * pIsPrivate )
+                                 uint8_t ** ppucData,
+                                 uint32_t * pulDataSize,
+                                 CK_BBOOL * pIsPrivate )
 {
     CK_RV ulReturn = CKR_OK;
     uint32_t ulDriverReturn = 0;
@@ -342,10 +360,16 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
     return ulReturn;
 }
 
-/*-----------------------------------------------------------*/
-
-void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
-                                       CK_ULONG ulDataSize )
+/**
+ * @brief Cleanup after PKCS11_GetObjectValue().
+ *
+ * @param[in] pucData       The buffer to free.
+ *                          (*ppucData from PKCS11_PAL_GetObjectValue())
+ * @param[in] ulDataSize    The length of the buffer to free.
+ *                          (*pulDataSize from PKCS11_PAL_GetObjectValue())
+ */
+void PKCS11_PAL_GetObjectValueCleanup( uint8_t * pucData,
+                                       uint32_t ulDataSize )
 {
     /* Unused parameters. */
     ( void ) ulDataSize;
@@ -355,5 +379,3 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
         vPortFree( pucData );
     }
 }
-
-/*-----------------------------------------------------------*/

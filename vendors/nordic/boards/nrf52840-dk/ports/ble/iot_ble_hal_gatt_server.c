@@ -242,7 +242,6 @@ static BTStatus_t prvAddServiceBlob( uint8_t ucServerIf,
 static BTStatus_t prvBTConfigureMtu( uint8_t ucServerIf,
                                      uint16_t usMtu );
 
-
 static BTGattServerInterface_t xGATTserverInterface =
 {
     .pxRegisterServer     = prvBTRegisterServer,
@@ -302,8 +301,6 @@ BTStatus_t prvBTGattServerInit( const BTGattServerCallbacks_t * pxCallbacks )
 
     if( xErrCode == NRF_SUCCESS )
     {
-        xGattTableSize = 0;
-        xGattMappingTablesSize = 0;
         bGattInitialized = true;
     }
 

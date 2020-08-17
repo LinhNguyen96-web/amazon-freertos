@@ -1,5 +1,5 @@
 /*
- * FreeRTOS BLE HAL V5.0.1
+ * FreeRTOS BLE HAL V4.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -37,48 +37,31 @@
 #ifndef _BT_HAL_AVSRC_PROFILE_H
 #define _BT_HAL_AVSRC_PROFILE_H
 
-#include <stddef.h>
 #include <stdint.h>
 #include "bt_hal_manager_types.h"
 
-/**
- * @brief Bluetooth AV connection states
- */
+/** Bluetooth AV connection states */
 typedef enum
 {
-    eBTAvsrcConnectionStateDisconnected = 0, /**< Disconnected */
-    eBTAvsrcConnectionStateConnecting = 1,   /**< Connecting */
-    eBTAvsrcConnectionStateConnected = 2,    /**< Connected */
-    eBTAvsrcConnectionStateDisconnecting = 3 /**< Disconnecting */
+    eBTAvsrcConnectionStateDisconnected = 0,
+    eBTAvsrcConnectionStateConnecting,
+    eBTAvsrcConnectionStateConnected,
+    eBTAvsrcConnectionStateDisconnecting
 } BTAvConnectionState_t;
 
-/**
- * @brief Bluetooth AV data path states
- */
+/** Bluetooth AV data path states */
 typedef enum
 {
-    eBTAvsrcAudioStateRemoteSuspend = 0, /**< Audio Suspended */
-    eBTAvsrcAudioStateStopped = 1,       /**< Audio Stopped */
-    eBTAvsrcAudioStateStarted = 2,       /**< Audio Started */
+    eBTAvsrcAudioStateRemoteSuspend = 0,
+    eBTAvsrcAudioStateStopped,
+    eBTAvsrcAudioStateStarted,
 } BTAvAudioState_t;
 
-/** Audio callback structure */
-
-/**
- * @brief Callback invoked in to notify AV connection state change
- *
- * @param[in] xState Connection state
- * @param[in] pxBdAddr Address of the Remote device
- */
+/** Callback invoked in to notifiy AV connection state change */
 typedef void (* BTAvsrcConnectionStateCallback_t)( BTAvConnectionState_t xState,
                                                    BTBdaddr_t * pxBdAddr );
 
-/**
- * @brief Callback invoked in to notify AV Audio state change
- *
- * @param[in] xState Audio state
- * @param[in] pxBdAddr Address of the Remote device
- */
+/** Callback invoked in to notifiy AV Audio state change */
 typedef void (* BTAvsrcAudioStateCallback_t)( BTAvAudioState_t xState,
                                               BTBdaddr_t * pxBdAddr );
 
@@ -125,7 +108,7 @@ typedef struct
     BTStatus_t ( * pxAvsrcDisconnect )( BTBdaddr_t * pxRemote_addr );
 } BTAvsrcInterface_t;
 
-const BTAvsrcInterface_t * BT_GetAvsrcInterface();
+extern const BTAvsrcInterface_t * BT_GetAvsrcInterface();
 
 #endif /* _BT_HAL_AVSRC_PROFILE_H */
 /** @} */

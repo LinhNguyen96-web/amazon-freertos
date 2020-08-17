@@ -33,16 +33,6 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
-#ifdef CONFIG_MEDTLS_USE_AFR_MEMORY
-    #include <stddef.h>
-
-    extern void pvCalloc( size_t xNumElements,
-                          size_t xSize ) ;
-    extern void vPortFree( void );
-    MBEDTLS_PLATFORM_STD_CALLOC pvCalloc
-    MBEDTLS_PLATFORM_STD_FREE   vPortFree
-#endif
-
 /**
  * \name SECTION: System support
  *

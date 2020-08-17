@@ -30,14 +30,10 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 
-/**
- * @brief Mutext struct used to synchronize mbedTLS operations.
- *
- */
 typedef struct
 {
-    SemaphoreHandle_t mutex; /**< @brief FreeRTOS semaphore. */
-    char is_valid;           /**< @brief Flag used by mbedTLS to track wether a mutex is valid. */
+    SemaphoreHandle_t mutex;
+    char is_valid;
 } mbedtls_threading_mutex_t;
 
 extern void mbedtls_threading_set_alt( void ( * mutex_init )( mbedtls_threading_mutex_t * ),

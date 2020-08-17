@@ -1,5 +1,5 @@
 /*
- * FreeRTOS BLE HAL V5.0.1
+ * FreeRTOS BLE HAL V4.0.1
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -39,49 +39,39 @@
 
 #include "bt_hal_manager.h"
 
-/**
- * @brief Bluetooth Adapter Visibility Modes
- */
+/** Bluetooth Adapter Visibility Modes*/
 typedef enum
 {
-    eBTScanModeNone = 0,                   /**< Not visible */
-    eBTScanModeConnectable = 1,            /**< Connectable */
-    eBTScanModeConnectableDiscoverable = 2 /**< Connectable and Discoverable */
+    eBTScanModeNone,
+    eBTScanModeConnectable,
+    eBTScanModeConnectableDiscoverable
 } BTScanMode_t;
 
 
-/**
- * @brief Bluetooth scan parameters
- */
+/* Bluetooth scan params * / */
 typedef enum
 {
-    eBTPageScanInterval220ms = 0, /**< 220 ms page scan interval */
-    eBTPageScanInterval1280ms = 1 /**< 1280 ms page scan interval */
+    eBTPageScanInterval220ms,
+    eBTPageScanInterval1280ms
 } BTScanParam_t;
 
 
-/**
- * @brief Bluetooth Adapter Discovery state
- */
+/** Bluetooth Adapter Discovery state */
 typedef enum
 {
-    eBTDiscoveryStopped = 0, /**< Discovery Stopped */
-    eBTDiscoveryStarted = 1  /**< Discovery Started */
+    eBTDiscoveryStopped,
+    eBTDiscoveryStarted
 } BTDiscoveryState_t;
 
-/**
- * @brief Bluetooth ACL connection state
- */
+/** Bluetooth ACL connection state */
 typedef enum
 {
-    eBTaclStateConnected = 0,   /**< ACL connected */
-    eBTaclStateDisconnected = 1 /**< ACL disconnected */
+    eBTaclStateConnected,
+    eBTaclStateDisconnected
 } BTaclState_t;
 
 
-/**
- * @brief Bluetooth SDP service record
- */
+/** Bluetooth SDP service record */
 typedef struct
 {
     BTUuid_t xUuid;
@@ -89,18 +79,14 @@ typedef struct
     char * cName; /* what's the maximum length */
 } BTServiceRecord_t;
 
-/**
- * @brief manufacturer information EIR data
- */
+/* manufacturer information EIR data */
 typedef struct
 {
     uint32_t ulVvendor;
     uint32_t ulProduct;
 } BTEirManfInfo_t;
 
-/**
- * @brief gadget manufacturer information EIR data
- */
+/* gadget manufacturer information EIR data */
 typedef struct
 {
     uint32_t ulVendor;
@@ -108,18 +94,14 @@ typedef struct
     uint32_t ulUuid;
 } BTGadgetEirManfInfo_t;
 
-/**
- * @brief Bluetooth Scan types
- */
+/** Bluetooth Scan types */
 typedef enum
 {
-    eBTScanTypeStandard = 0,  /**< Standard Scan Type */
-    eBTScanTypeInterlaced = 1 /**< Interlaced Scan Type */
+    eBTScanTypeStandard,
+    eBTScanTypeInterlaced
 } BTScanType_t;
 
-/**
- * @brief Classic Device Property Types
- */
+/* Bluetooth local device and Remote Device property types */
 typedef enum
 {
     /**
@@ -134,42 +116,42 @@ typedef enum
      * Access mode - Only GET.
      * Data type   - BTBdaddr_t
      */
-    eBTPropertyBdaddr = 0x2,
+    eBTPropertyBdaddr,
 
     /**
      * Description - Device Type - BREDR, BLE or DUAL Mode
      * Access mode - Only GET.
      * Data type   - BTDeviceType_t.
      */
-    eBTPropertyTypeOfDevice = 0x3,
+    eBTPropertyTypeOfDevice,
 
     /**
      * Description - Bluetooth Service 128-bit UUIDs
      * Access mode - Only GET.
      * Data type   - Array of BTUuid_t (Array size inferred from property length).
      */
-    eBTPropertyUUIDS = 0x4,
+    eBTPropertyUUIDS,
 
     /**
      * Description - Bluetooth Class of Device as found in Assigned Numbers
      * Access mode - Only GET.
      * Data type   - uint32_t.
      */
-    eBTPropertyClassOfDevice = 0x5,
+    eBTPropertyClassOfDevice,
 
     /**
      * Description - Bluetooth Service Record
      * Access mode - Only GET.
      * Data type   - BTServiceRecord_t
      */
-    eBTPropertyServiceRecord = 0x6,
+    eBTPropertyServiceRecord,
 
     /**
      * Description - Bluetooth Adapter Discovery timeout (in seconds)
      * Access mode - GET and SET
      * Data type   - uint32_t
      */
-    eBTPropertyAdapterDiscoveryTimeout = 0x7,
+    eBTPropertyAdapterDiscoveryTimeout,
     /* Properties unique to adapter */
 
     /**
@@ -177,7 +159,7 @@ typedef enum
      * Access mode - GET and SET
      * Data type   - BTScanMode_t.
      */
-    eBTPropertyAdapterScanMode = 0x8,
+    eBTPropertyAdapterScanMode,
     /* Properties unique to manufacturer and device */
 
     /**
@@ -217,9 +199,7 @@ typedef enum
     eBTPropertyGadgetEIRManfInfo = 0x103,
 } BTClassicPropertyType_t;
 
-/**
- * @brief Classic Device Property
- */
+/** Bluetooth Adapter Property data structure */
 typedef struct
 {
     BTClassicPropertyType_t xType;
@@ -227,60 +207,33 @@ typedef struct
     void * pvVal;
 } BTClassicProperty_t;
 
-/**
- *
- * @brief Callback invoked in response to @ref pxGetClassicDeviceProperty
- * and @ref pxSetClassicDeviceProperty.
- *
- * @param[in] xStatus Returns eBTStatusSuccess if operation succeeded.
- * @param[in] ulNumProperties Number of classic specific properties.
- * @param[in] pxProperties Properties array.
- */
+
+/** GET/SET local device Properties callback */
 typedef void (* BTClassicDevicePropertiesCallback_t)( BTStatus_t xStatus,
                                                       uint32_t ulNumProperties,
                                                       BTClassicProperty_t * pxProperties );
 
-/**
- *
- * @brief Callback invoked in response to @ref pxGetRemoteClassicDeviceProperty
- * and @ref pxSetRemoteClassicDeviceProperty.
- *
- * @param[in] xStatus Returns eBTStatusSuccess if operation succeeded.
- * @param[in] pxBdAddr Address of the Remote device
- * @param[in] ulNumProperties Number of classic specific properties.
- * @param[in] pxProperties Properties array.
+/** GET/SET Remote Device Properties callback */
+
+/** TODO: For remote device properties, do not see a need to get/set
+ * multiple properties - num_properties shall be 1
  */
 typedef void ( * BTClassicRemoteDevicePropertiesCallback_t )( BTStatus_t xStatus,
                                                               BTBdaddr_t * pxBdAddr,
                                                               uint32_t ulNumProperties,
                                                               BTClassicProperty_t * pxProperties );
 
-/**
- * @brief Callback invoked in response to device discovery
- * If EIR data is not present, then BD_NAME and RSSI shall be NULL and -1
- * respectively.
- *
- * @param[in] ulNumProperties Number of classic specific properties
- * @param[in] pxProperties Properties array
- */
+/** New device discovered callback */
+
+/** If EIR data is not present, then BD_NAME and RSSI shall be NULL and -1
+ * respectively */
 typedef void (* BTDeviceFoundCallback_t)( uint32_t ulNumProperties,
                                           BTClassicProperty_t * pxProperties );
 
-/**
- * @brief Callback invoked in response to @ref pxStartDiscovery
- * and @ref pxStopDiscovery
- *
- * @param[in] xState Discovery state
- */
+/** Discovery state changed callback */
 typedef void (* BTDiscoveryStateChangedCallback_t)( BTDiscoveryState_t xState );
 
-/**
- * @brief Callback invoked in response to ACL connection state change
- *
- * @param[in] xStatus Returns eBTStatusSuccess if operation succeeded.
- * @param[in] pxRemoteBdAddr Address of the Remote device
- * @param[in] xState ACL connection state
- */
+/** Bluetooth ACL connection state changed callback */
 typedef void (* BTaclStateChangedCallback_t)( BTStatus_t xStatus,
                                               BTBdaddr_t * pxRemoteBdAddr,
                                               BTaclState_t xState );
@@ -396,7 +349,7 @@ typedef struct
     const void * ( *ppvGetProfileInterface )( BTProfile_t xProfile );
 } BTClassicInterface_t;
 
-const BTClassicInterface_t * BT_GetClassicAdapter();
+extern const BTClassicInterface_t * BT_GetClassicAdapter();
 
 #endif /* _BT_HAL_MANAGER_ADAPTER_CLASSIC_ */
 /** @} */

@@ -135,8 +135,8 @@ void prvLabelToFilenameHandle( uint8_t * pcLabel,
  * @return The file handle of the object that was stored.
  */
 CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
-                                        CK_BYTE_PTR pucData,
-                                        CK_ULONG ulDataSize )
+                                        uint8_t * pucData,
+                                        uint32_t ulDataSize )
 {
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char * pcFileName = NULL;
@@ -164,15 +164,15 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
  * Port-specific object handle retrieval.
  *
  *
- * @param[in] pxLabel         Pointer to the label of the object
+ * @param[in] pLabel         Pointer to the label of the object
  *                           who's handle should be found.
  * @param[in] usLength       The length of the label, in bytes.
  *
  * @return The object handle if operation was successful.
  * Returns eInvalidHandle if unsuccessful.
  */
-CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
-                                        CK_ULONG usLength )
+CK_OBJECT_HANDLE PKCS11_PAL_FindObject( uint8_t * pLabel,
+                                        uint8_t usLength )
 {
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char * pcFileName = NULL;
@@ -180,7 +180,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
     size_t xFileLength = 0;
 
     /* Translate from the PKCS#11 label to local storage file name. */
-    prvLabelToFilenameHandle( pxLabel, &pcFileName, &xHandle );
+    prvLabelToFilenameHandle( pLabel, &pcFileName, &xHandle );
 
     /* Check if the file exists. */
     if( pdFALSE == mflash_read_file( pcFileName, &pFile, &xFileLength ) )
@@ -218,9 +218,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
  * error.
  */
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-                                      CK_BYTE_PTR * ppucData,
-                                      CK_ULONG_PTR pulDataSize,
-                                      CK_BBOOL * pIsPrivate )
+                                 uint8_t ** ppucData,
+                                 uint32_t * pulDataSize,
+                                 CK_BBOOL * pIsPrivate )
 {
     char * pcFileName = NULL;
     CK_RV ulReturn = CKR_OK;
@@ -267,8 +267,8 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
  * @param[in] ulDataSize    The length of the buffer to free.
  *                          (*pulDataSize from PKCS11_PAL_GetObjectValue())
  */
-void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
-                                       CK_ULONG ulDataSize )
+void PKCS11_PAL_GetObjectValueCleanup( uint8_t * pucData,
+                                       uint32_t ulDataSize )
 {
     /* Unused parameters. */
     ( void ) pucData;
@@ -278,15 +278,40 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
      * to be done. */
 }
 
-CK_RV PKCS11_PAL_Initialize( void )
-{ 
+
+/**
+ *      PKCS#11 Override
+ *
+ */
+
+extern CK_RV prvMbedTLS_Initialize( void );
+
+/**
+ * @brief Initialize the Cryptoki module for use.
+ *
+ * Overrides the implementation of C_Initialize in
+ * iot_pkcs11_mbedtls.c when pkcs11configC_INITIALIZE_ALT
+ * is defined.
+ */
+#ifndef pkcs11configC_INITIALIZE_ALT
+    #error LPC54018 requires alternate C_Initialization
+#endif
+
+CK_DECLARE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
+{ /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( pvInitArgs );
 
     CK_RV xResult = CKR_OK;
 
     /* Initialize flash storage. */
-    if( pdFALSE == mflash_init( g_cert_files, 1 ) )
+    if( pdTRUE == mflash_init( g_cert_files, 1 ) )
     {
-        xResult = CKR_FUNCTION_FAILED;
+        xResult = CKR_OK;
+    }
+
+    if( xResult == CKR_OK )
+    {
+        xResult = prvMbedTLS_Initialize();
     }
 
     return xResult;

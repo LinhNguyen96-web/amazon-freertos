@@ -59,7 +59,6 @@ static bool wifi_auth_failure;
 #define WIFI_FLASH_NS     "WiFi"
 #define MAX_WIFI_KEY_WIDTH         ( 5 )
 #define MAX_SECURITY_MODE_LEN      ( 1 )
-#define MAX_AP_CONNECTIONS         ( 4 )
 
 typedef struct StorageRegistry
 {
@@ -263,64 +262,24 @@ BaseType_t WIFI_IsConnected( void )
 
 WIFIReturnCode_t WIFI_Off( void )
 {
-    esp_err_t ret;
-    if( xSemaphoreTake( xWiFiSem, xSemaphoreWaitTicks ) == pdTRUE )
-    {
-        if (wifi_conn_state == true) {
-            ret = esp_wifi_disconnect();
-            if (ret == ESP_OK) {
-                // Wait for wifi disconnected event
-                xEventGroupWaitBits(wifi_event_group, DISCONNECTED_BIT, pdTRUE, pdFALSE, portMAX_DELAY);
-            } else {
-                ESP_LOGE(TAG, "%s:Failed to disconnect wifi %d", __func__, ret);
-                goto err;
-            }
-        }
-
-        if ((ret = esp_wifi_deinit()) != ESP_OK) {
-            if (ret == ESP_ERR_WIFI_NOT_STOPPED) {
-                ret = esp_wifi_stop();
-                if (ret != ESP_OK) {
-                    ESP_LOGE(TAG, "%s:Failed to stop wifi %d", __func__, ret);
-                    goto err;
-                }
-                if (esp_wifi_deinit() != ESP_OK) {
-                    ESP_LOGE(TAG, "%s:Failed to deinit %d", __func__, ret);
-                    goto err;
-                }
-            } else {
-                ESP_LOGE(TAG, "%s:Failed to deinit %d", __func__, ret);
-                goto err;
-            }
-        }
-        if (wifi_event_group) {
-            vEventGroupDelete(wifi_event_group);
-            wifi_event_group = NULL;
-        }
-        xSemaphoreGive( xWiFiSem );
-        return eWiFiSuccess;
-err:
-        xSemaphoreGive( xWiFiSem );
-        return eWiFiFailure;
-    }
-    return eWiFiFailure;
+    return eWiFiSuccess;
 }
 /*-----------------------------------------------------------*/
 
 WIFIReturnCode_t WIFI_On( void )
 {
-    static bool event_loop_inited;
-    esp_err_t ret;
-    // Check if Event Loop is already initialized
-    if (event_loop_inited == false) {
-        ret = esp_event_loop_init(event_handler, NULL);
-        if (ret != ESP_OK) {
-            ESP_LOGE(TAG, "%s: Failed to init event loop %d", __func__, ret);
-            goto err;
-        }
-        event_loop_inited = true;
+    static bool wifi_inited;
+
+    // Check if WiFi is already initialized
+    if (wifi_inited == true) {
+        return eWiFiSuccess;
     }
 
+    esp_err_t ret = esp_event_loop_init(event_handler, NULL);
+    if (ret != ESP_OK) {
+        ESP_LOGE(TAG, "%s: Failed to init event loop %d", __func__, ret);
+        goto err;
+    }
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ret = esp_wifi_init(&cfg);
@@ -343,10 +302,9 @@ WIFIReturnCode_t WIFI_On( void )
 
     /* Create sync mutex */
     static StaticSemaphore_t xSemaphoreBuffer;
-    if (xWiFiSem == NULL) {
-        xWiFiSem = xSemaphoreCreateMutexStatic( &( xSemaphoreBuffer ) );
-    }
+    xWiFiSem = xSemaphoreCreateMutexStatic( &( xSemaphoreBuffer ) );
 
+    wifi_inited = true;
     return eWiFiSuccess;
 err:
     return eWiFiFailure;
@@ -1260,11 +1218,7 @@ static esp_err_t WIFI_SetSecurity( WIFISecurity_t securityMode, wifi_auth_mode_t
 
 WIFIReturnCode_t WIFI_ConfigureAP( const WIFINetworkParams_t * const pxNetworkParams )
 {
-    wifi_config_t wifi_config = {
-        .ap = {
-            .max_connection = MAX_AP_CONNECTIONS,
-        },
-    };
+    wifi_config_t wifi_config = { 0 };
     esp_err_t ret;
     WIFIReturnCode_t wifi_ret = eWiFiFailure;
 

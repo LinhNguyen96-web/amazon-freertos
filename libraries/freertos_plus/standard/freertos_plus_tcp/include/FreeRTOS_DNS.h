@@ -43,9 +43,9 @@ extern "C" {
  * The target IP address will be 224.0.0.252
  */
 #if( ipconfigBYTE_ORDER == pdFREERTOS_BIG_ENDIAN )
-	#define	ipLLMNR_IP_ADDR			0xE00000FCUL
+	#define	ipLLMNR_IP_ADDR			0xE00000FC
 #else
-	#define	ipLLMNR_IP_ADDR			0xFC0000E0UL
+	#define	ipLLMNR_IP_ADDR			0xFC0000E0
 #endif /* ipconfigBYTE_ORDER == pdFREERTOS_BIG_ENDIAN */
 
 #define	ipLLMNR_PORT	5355 /* Standard LLMNR port. */
@@ -55,21 +55,18 @@ extern "C" {
 #define	ipNBNS_PORT		137	/* NetBIOS Name Service. */
 #define	ipNBDGM_PORT	138 /* Datagram Service, not included. */
 
-#if( ipconfigUSE_LLMNR == 1 ) || ( ipconfigUSE_NBNS == 1 )
-	/*
-	 * The following function should be provided by the user and return true if it
-	 * matches the domain name.
-	 */
-	extern BaseType_t xApplicationDNSQueryHook( const char *pcName );
-#endif	/* ( ipconfigUSE_LLMNR == 1 ) || ( ipconfigUSE_NBNS == 1 ) */
+/*
+ * The following function should be provided by the user and return true if it
+ * matches the domain name.
+ */
+extern BaseType_t xApplicationDNSQueryHook( const char *pcName );
 
 /*
  * LLMNR is very similar to DNS, so is handled by the DNS routines.
  */
-uint32_t ulDNSHandlePacket( const NetworkBufferDescriptor_t *pxNetworkBuffer );
+uint32_t ulDNSHandlePacket( NetworkBufferDescriptor_t *pxNetworkBuffer );
 
 #if( ipconfigUSE_LLMNR == 1 )
-	/* The LLMNR MAC address is 01:00:5e:00:00:fc */
 	extern const MACAddress_t xLLMNR_MacAdress;
 #endif /* ipconfigUSE_LLMNR */
 
@@ -87,13 +84,12 @@ uint32_t ulDNSHandlePacket( const NetworkBufferDescriptor_t *pxNetworkBuffer );
 
 #if( ipconfigUSE_DNS_CACHE != 0 )
 
-	/* Look for the indicated host name in the DNS cache. Returns the IPv4 
-	address if present, or 0x0 otherwise. */
+    /* Look for the indicated host name in the DNS cache. Returns the IPv4 
+    address if present, or 0x0 otherwise. */
 	uint32_t FreeRTOS_dnslookup( const char *pcHostName );
 
-	/* Remove all entries from the DNS cache. */
-	void FreeRTOS_dnsclear( void );
-
+    /* Remove all entries from the DNS cache. */
+    void FreeRTOS_dnsclear();
 #endif /* ipconfigUSE_DNS_CACHE != 0 */
 
 #if( ipconfigDNS_USE_CALLBACKS != 0 )
@@ -108,32 +104,17 @@ uint32_t ulDNSHandlePacket( const NetworkBufferDescriptor_t *pxNetworkBuffer );
 	 * Asynchronous version of gethostbyname()
 	 * xTimeout is in units of ms.
 	 */
-	uint32_t FreeRTOS_gethostbyname_a( const char *pcHostName, FOnDNSEvent pCallback, void *pvSearchID, TickType_t uxTimeout );
+	uint32_t FreeRTOS_gethostbyname_a( const char *pcHostName, FOnDNSEvent pCallback, void *pvSearchID, TickType_t xTimeout );
 	void FreeRTOS_gethostbyname_cancel( void *pvSearchID );
 
 #endif
 
 /*
- * Lookup a IPv4 node in a blocking-way.
- * It returns a 32-bit IP-address, 0 when not found.
- * gethostbyname() is already deprecated.
+ * FULL, UP-TO-DATE AND MAINTAINED REFERENCE DOCUMENTATION FOR ALL THESE
+ * FUNCTIONS IS AVAILABLE ON THE FOLLOWING URL:
+ * _TBD_ Add URL
  */
 uint32_t FreeRTOS_gethostbyname( const char *pcHostName );
-
-#if( ipconfigDNS_USE_CALLBACKS == 1 )
-	/*
-	 * The function vDNSInitialise() initialises the DNS module.
-	 * It will be called "internally", by the IP-task.
-	 */
-	void vDNSInitialise( void );
-#endif	/* ( ipconfigDNS_USE_CALLBACKS == 1 ) */
-
-#if( ipconfigDNS_USE_CALLBACKS == 1 )
-	/*
-	 * A function local to the library.
-	 */
-	extern void vDNSCheckCallBack( void *pvSearchID );
-#endif
 
 
 #ifdef __cplusplus

@@ -24,8 +24,8 @@
  */
 
 /**
- * @file iot_ble_numericComparison.h
- * @brief Header file for supporting user confirmation for BLE passkey.
+ * @file aws_iot_network.h
+ * @brief Header file containing the network management APIs
  */
 #ifndef _AWS_BLE_NUMERIC_COMPARISON_H_
 #define _AWS_BLE_NUMERIC_COMPARISON_H_
@@ -53,4 +53,4 @@ extern BaseType_t getUserMessage( INPUTMessage_t * pxINPUTmessage,
                                   TickType_t xAuthTimeout );
 
 
-#endif /* _AWS_BLE_NUMERIC_COMPARISON_H_ */
+#endif /* _AWS_IOT_NETWORK_MANAGER_H_ */

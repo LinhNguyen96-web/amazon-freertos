@@ -53,9 +53,7 @@
             "OtaTestIncorrectPlatform",
             "OtaTestSingleByteImage",
             "OtaTestBackToBackDownloads",
-            "OtaTestIncorrectWifiPassword",
-            "OtaTestDisconnectResume",
-            "OtaTestDisconnectCancelUpdate"
+            "OtaTestIncorrectWifiPassword"
         ]
     },
     "flash_config": {

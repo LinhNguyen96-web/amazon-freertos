@@ -22,9 +22,7 @@ endfunction()
 # Get all supported boards from a vendor.
 function(afr_get_vendor_boards arg_vendor arg_boards)
     set(vendors_dir "${AFR_ROOT_DIR}/vendors")
-    if(EXISTS "${vendors_dir}/${arg_vendor}/manifest.cmake")
-        include("${vendors_dir}/${arg_vendor}/manifest.cmake")
-    endif()
+    include("${vendors_dir}/${arg_vendor}/manifest.cmake")
 
     set(${arg_boards} "${AFR_MANIFEST_SUPPORTED_BOARDS}" PARENT_SCOPE)
 endfunction()

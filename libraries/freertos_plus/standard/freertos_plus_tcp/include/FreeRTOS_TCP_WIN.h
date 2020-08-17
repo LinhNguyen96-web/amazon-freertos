@@ -35,8 +35,9 @@
 extern "C" {
 #endif
 
-/* The name xTCPTimer was already use as the name of an IP-timer. */
-typedef struct xTCPTimerStruct
+extern BaseType_t xTCPWindowLoggingLevel;
+
+typedef struct xTCPTimer
 {
 	uint32_t ulBorn;
 } TCPTimer_t;
@@ -63,7 +64,7 @@ typedef struct xTCP_SEGMENT
 	} u;
 #if( ipconfigUSE_TCP_WIN != 0 )
 	struct xLIST_ITEM xQueueItem;	/* TX only: segments can be linked in one of three queues: xPriorityQueue, xTxQueue, and xWaitQueue */
-	struct xLIST_ITEM xSegmentItem;	/* With this item the segment can be connected to a list, depending on who is owning it */
+	struct xLIST_ITEM xListItem;	/* With this item the segment can be connected to a list, depending on who is owning it */
 #endif
 } TCPSegment_t;
 
@@ -79,9 +80,9 @@ typedef struct xTCP_WINSIZE
  */
 /* Keep this as a multiple of 4 */
 #if( ipconfigUSE_TCP_WIN == 1 )
-	#define ipSIZE_TCP_OPTIONS	16U
+	#define ipSIZE_TCP_OPTIONS	16u
 #else
-	#define ipSIZE_TCP_OPTIONS	12U
+	#define ipSIZE_TCP_OPTIONS   12u
 #endif
 
 /*
@@ -148,7 +149,7 @@ void vTCPWindowCreate( TCPWindow_t *pxWindow, uint32_t ulRxWindowLength,
 
 /* Destroy a window (always returns NULL)
  * It will free some resources: a collection of segments */
-void vTCPWindowDestroy( TCPWindow_t const * pxWindow );
+void vTCPWindowDestroy( TCPWindow_t *pxWindow );
 
 /* Initialize a window */
 void vTCPWindowInit( TCPWindow_t *pxWindow, uint32_t ulAckNumber, uint32_t ulSequenceNumber, uint32_t ulMSS );
@@ -166,9 +167,16 @@ void vTCPSegmentCleanup( void );
  * But pxWindow->ackno should always be used to set "BUF->ackno" */
 int32_t lTCPWindowRxCheck( TCPWindow_t *pxWindow, uint32_t ulSequenceNumber, uint32_t ulLength, uint32_t ulSpace );
 
+/* When lTCPWindowRxCheck returned false, please call store for this unexpected data */
+BaseType_t xTCPWindowRxStore( TCPWindow_t *pxWindow, uint32_t ulSequenceNumber, uint32_t ulLength );
+
 /* This function will be called as soon as a FIN is received. It will return true
  * if there are no 'open' reception segments */
-BaseType_t xTCPWindowRxEmpty( const TCPWindow_t *pxWindow );
+BaseType_t xTCPWindowRxEmpty( TCPWindow_t *pxWindow );
+
+/* _HT_ Temporary function for testing/debugging
+ * Not used at this moment */
+void vTCPWinShowSegments( TCPWindow_t *pxWindow, BaseType_t bForRx );
 
 /*=============================================================================
  *
@@ -180,12 +188,12 @@ BaseType_t xTCPWindowRxEmpty( const TCPWindow_t *pxWindow );
 int32_t lTCPWindowTxAdd( TCPWindow_t *pxWindow, uint32_t ulLength, int32_t lPosition, int32_t lMax );
 
 /* Check data to be sent and calculate the time period we may sleep */
-BaseType_t xTCPWindowTxHasData( TCPWindow_t const * pxWindow, uint32_t ulWindowSize, TickType_t *pulDelay );
+BaseType_t xTCPWindowTxHasData( TCPWindow_t *pxWindow, uint32_t ulWindowSize, TickType_t *pulDelay );
 
 /* See if anything is left to be sent
  * Function will be called when a FIN has been received. Only when the TX window is clean,
  * it will return pdTRUE */
-BaseType_t xTCPWindowTxDone( const TCPWindow_t *pxWindow );
+BaseType_t xTCPWindowTxDone( TCPWindow_t *pxWindow );
 
 /* Fetches data to be sent.
  * apPos will point to a location with the circular data buffer: txStream */

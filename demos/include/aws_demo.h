@@ -53,6 +53,8 @@ void runDemoTask( void * pArgument );
 
 void DEMO_RUNNER_RunDemos( void );
 
+void vApplicationInit( void );
+
 typedef struct demoContext
 {
     /* Network types for the demo */
